@@ -29,6 +29,15 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Design tokens from design.md */
+    --color-primary-500: 123 97 255; /* #7B61FF Electric Violet */
+    --color-secondary-500: 255 111 97; /* #FF6F61 Neon Coral */
+    --color-accent-500: 0 229 160; /* #00E5A0 Mint Green */
+    --color-neutral-100: 244 244 244; /* #F4F4F4 Warm Gray */
+    --color-text-primary: 43 43 43; /* #2B2B2B Charcoal */
+    --color-text-secondary: 110 110 110; /* #6E6E6E Slate Gray */
+    --color-highlight: 255 249 91; /* #FFF95B Lemon Yellow */
   }
 
   .dark {
@@ -65,5 +74,32 @@
   }
   body {
     @apply bg-background text-foreground;
+    color: rgb(var(--color-text-primary));
+    background-color: rgb(var(--color-neutral-100));
+  }
+  a:focus, button:focus, [tabindex]:focus {
+    @apply outline-none ring-2 ring-offset-2;
+    box-shadow: 0 0 0 2px rgb(var(--color-highlight));
   }
 }
+
+/* Utility tokens */
+.text-primary-token { color: rgb(var(--color-text-primary)); }
+.text-secondary-token { color: rgb(var(--color-text-secondary)); }
+.bg-brand-primary { background-color: rgb(var(--color-primary-500)); }
+.bg-brand-secondary { background-color: rgb(var(--color-secondary-500)); }
+.bg-brand-accent { background-color: rgb(var(--color-accent-500)); }
+.ring-brand-highlight { box-shadow: 0 0 0 2px rgb(var(--color-highlight)); }
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: -40px;
+  background: #fff;
+  color: #000;
+  padding: 8px 12px;
+  z-index: 50;
+  transition: top .2s ease;
+}
+.skip-link:focus { top: 8px; }

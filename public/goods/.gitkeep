@@ -1,0 +1,14 @@
+# 굿즈 이미지 폴더
+# 이 폴더는 굿즈샵에서 사용하는 제품 이미지를 저장합니다.
+
+## 폴더 구조:
+# - mugs/ : 머그컵 이미지
+# - tote-bags/ : 토트백/에코백 이미지
+# - notebooks/ : 노트북/노트 이미지
+# - badges/ : 뱃지 이미지
+# - others/ : 기타 제품 이미지
+
+## 파일 명명 규칙:
+# {product-id}_{image-type}.{ext}
+# 예: mug_goodvibes_main.jpg, mug_goodvibes_detail.jpg
+
