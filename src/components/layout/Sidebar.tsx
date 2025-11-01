@@ -26,6 +26,7 @@ const items: MenuItem[] = [
   { href: '/goods', label: '굿즈샵' },
   { href: '/mypage', label: '마이페이지' },
   { href: '/support', label: '고객센터' },
+  { href: '/admin', label: '관리자' },
 ]
 
 export default function Sidebar() {

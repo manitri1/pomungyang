@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { characters } from '@/features/characters/constants/characters'
 import { ArrowLeft, Heart, Folder, Briefcase, Settings, Sparkles } from 'lucide-react'
-import { ContentIdeaGenerator } from '@/features/characters/components/ContentIdeaGenerator'
 
 export default function CharacterDetailPage({
   params,
@@ -112,15 +111,6 @@ export default function CharacterDetailPage({
         </div>
       </div>
 
-      {/* 컨텐츠 아이디어 생성기 섹션 */}
-      <div className="mx-auto max-w-7xl gap-8 p-6 lg:p-12">
-        <div className="max-w-3xl">
-          <ContentIdeaGenerator
-            characterName={character.name}
-            characterPersona={character.persona}
-          />
-        </div>
-      </div>
     </div>
   )
 }

@@ -1,15 +1,44 @@
 'use client'
 
-import { useState } from 'react'
-import { products, type Product } from '@/features/goods/constants/products'
+import { useState, useEffect } from 'react'
+import { products as initialProducts, type Product } from '@/features/goods/constants/products'
 import GoodsCard from '@/features/goods/components/GoodsCard'
 import GoodsDetailSheet from '@/features/goods/components/GoodsDetailSheet'
 
+const STORAGE_KEY = 'public_goods_products'
+
 export default function Page({ params }: { params: Promise<Record<string, string>> }) {
   void params
+  const [products, setProducts] = useState<Product[]>(initialProducts)
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState<Product | null>(null)
   const onOpen = (p: Product) => { setActive(p); setOpen(true) }
+
+  useEffect(() => {
+    const loadProducts = () => {
+      if (typeof window === 'undefined') return
+      
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          setProducts(JSON.parse(saved))
+        } else {
+          setProducts(initialProducts)
+        }
+      } catch {
+        setProducts(initialProducts)
+      }
+    }
+
+    loadProducts()
+
+    // 굿즈 업데이트 이벤트 리스너
+    window.addEventListener('goodsUpdated', loadProducts)
+    
+    return () => {
+      window.removeEventListener('goodsUpdated', loadProducts)
+    }
+  }, [])
 
   return (
     <div className="space-y-4">
