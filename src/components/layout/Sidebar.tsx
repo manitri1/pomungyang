@@ -21,6 +21,7 @@ const items: MenuItem[] = [
     ],
   },
   { href: '/challenges', label: '챌린지' },
+  { href: '/challenges/events', label: '이벤트' },
   { href: '/popup', label: '팝업스토어' },
   { href: '/tour', label: '캐릭터 투어' },
   { href: '/goods', label: '굿즈샵' },
