@@ -11,7 +11,8 @@ import { ArrowLeft, Heart, ExternalLink, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale/ko'
 import { events } from '@/features/challenges/constants/events'
-import { eventPostStorage, type EventPost } from '@/features/challenges/constants/eventPosts'
+import { eventPostSupabaseStorage } from '@/features/challenges/lib/eventPostsSupabase'
+import type { EventPost } from '@/features/challenges/constants/eventPosts'
 import { useToast } from '@/hooks/use-toast'
 
 export default function EventPostDetailPage({
@@ -24,12 +25,23 @@ export default function EventPostDetailPage({
   const { toast } = useToast()
   const event = events.find((e) => e.id === eventId)
   const [post, setPost] = useState<EventPost | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (postId) {
-      const foundPost = eventPostStorage.getById(postId)
-      setPost(foundPost)
+    const loadPost = async () => {
+      if (postId) {
+        try {
+          setLoading(true)
+          const foundPost = await eventPostSupabaseStorage.getById(postId)
+          setPost(foundPost)
+        } catch (error) {
+          console.error('인증 포스트 로딩 실패:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
     }
+    loadPost()
   }, [postId])
 
   if (!event) {
@@ -44,6 +56,24 @@ export default function EventPostDetailPage({
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-gray-500">이벤트를 찾을 수 없습니다.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Link href={`/challenges/events/${eventId}`}>
+          <Button variant="ghost">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            이벤트로 돌아가기
+          </Button>
+        </Link>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-gray-500">로딩 중...</p>
           </CardContent>
         </Card>
       </div>
@@ -68,9 +98,11 @@ export default function EventPostDetailPage({
     )
   }
 
-  const handleLike = () => {
-    eventPostStorage.toggleLike(post.id)
-    const updatedPost = eventPostStorage.getById(post.id)
+  const handleLike = async () => {
+    if (!post) return
+    
+    await eventPostSupabaseStorage.toggleLike(post.id)
+    const updatedPost = await eventPostSupabaseStorage.getById(post.id)
     if (updatedPost) {
       setPost(updatedPost)
     }
@@ -80,14 +112,24 @@ export default function EventPostDetailPage({
     })
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    if (!post) return
+    
     if (confirm('정말 이 인증 포스트를 삭제하시겠습니까?')) {
-      eventPostStorage.delete(post.id)
-      toast({
-        title: '삭제 완료',
-        description: '인증 포스트가 삭제되었습니다.',
-      })
-      router.push(`/challenges/events/${eventId}`)
+      const success = await eventPostSupabaseStorage.delete(post.id)
+      if (success) {
+        toast({
+          title: '삭제 완료',
+          description: '인증 포스트가 삭제되었습니다.',
+        })
+        router.push(`/challenges/events/${eventId}`)
+      } else {
+        toast({
+          title: '삭제 실패',
+          description: '인증 포스트 삭제에 실패했습니다. 다시 시도해주세요.',
+          variant: 'destructive',
+        })
+      }
     }
   }
 
@@ -187,4 +229,3 @@ export default function EventPostDetailPage({
     </div>
   )
 }
-

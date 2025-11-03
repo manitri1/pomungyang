@@ -6,8 +6,12 @@ import Image from 'next/image'
 import { use } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { events } from '@/features/challenges/constants/events'
-import { eventPostStorage, type EventPost } from '@/features/challenges/constants/eventPosts'
+import { events as initialEvents, type Event } from '@/features/challenges/constants/events'
+
+const STORAGE_KEY = 'public_events'
+
+import { eventPostSupabaseStorage } from '@/features/challenges/lib/eventPostsSupabase'
+import type { EventPost } from '@/features/challenges/constants/eventPosts'
 import { Calendar, MapPin, Users, Target, ArrowLeft, Camera, Heart, MessageCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale/ko'
@@ -18,13 +22,54 @@ export default function EventDetailPage({
   params: Promise<{ eventId: string }>
 }) {
   const { eventId } = use(params)
+  const [events, setEvents] = useState<Event[]>(initialEvents)
   const event = events.find((e) => e.id === eventId)
-  const [posts, setPosts] = useState<EventPost[]>([])
 
   useEffect(() => {
-    if (eventId) {
-      setPosts(eventPostStorage.getAll(eventId))
+    // localStorage에서 이벤트 로드
+    const loadEvents = () => {
+      if (typeof window === 'undefined') return
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          const parsedEvents = JSON.parse(saved)
+          setEvents(parsedEvents)
+        }
+      } catch (error) {
+        console.error('이벤트 로딩 실패:', error)
+      }
     }
+
+    loadEvents()
+
+    // 이벤트 업데이트 리스너
+    const handleEventsUpdated = () => {
+      loadEvents()
+    }
+
+    window.addEventListener('eventsUpdated', handleEventsUpdated)
+    return () => {
+      window.removeEventListener('eventsUpdated', handleEventsUpdated)
+    }
+  }, [])
+  const [posts, setPosts] = useState<EventPost[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      if (eventId) {
+        try {
+          setLoading(true)
+          const data = await eventPostSupabaseStorage.getAll(eventId)
+          setPosts(data)
+        } catch (error) {
+          console.error('인증 포스트 로딩 실패:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+    loadPosts()
   }, [eventId])
 
   if (!event) {
@@ -204,7 +249,12 @@ export default function EventDetailPage({
           </div>
         </CardHeader>
         <CardContent>
-          {posts.length === 0 ? (
+          {loading ? (
+            <div className="py-12 text-center text-gray-500">
+              <Camera className="h-12 w-12 mx-auto mb-4 text-gray-300 animate-pulse" />
+              <p>로딩 중...</p>
+            </div>
+          ) : posts.length === 0 ? (
             <div className="py-12 text-center text-gray-500">
               <Camera className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p>아직 등록된 인증 사진이 없습니다.</p>

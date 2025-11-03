@@ -9,7 +9,8 @@ import { characters } from '@/features/characters/constants/characters'
 import { ArrowLeft, Eye, Calendar, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { worldviewStorage, type WorldviewPost } from '@/features/characters/constants/worldview'
+import { worldviewSupabaseStorage } from '@/features/characters/lib/worldviewSupabase'
+import type { WorldviewPost } from '@/features/characters/constants/worldview'
 import { formatDistanceToNow } from 'date-fns'
 import { useToast } from '@/hooks/use-toast'
 
@@ -24,30 +25,55 @@ export default function WorldviewPostDetailPage({
   const { toast } = useToast()
   const character = characters.find((c) => c.id === id)
   const [post, setPost] = useState<WorldviewPost | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadedPost = worldviewStorage.getById(postId)
-    if (loadedPost) {
-      setPost(loadedPost)
-      worldviewStorage.incrementViews(postId)
+    const loadPost = async () => {
+      try {
+        setLoading(true)
+        const loadedPost = await worldviewSupabaseStorage.getById(postId)
+        if (loadedPost) {
+          setPost(loadedPost)
+          await worldviewSupabaseStorage.incrementViews(postId)
+          // 조회수 증가 후 다시 로드
+          const updatedPost = await worldviewSupabaseStorage.getById(postId)
+          if (updatedPost) {
+            setPost(updatedPost)
+          }
+        }
+      } catch (error) {
+        console.error('게시글 로딩 실패:', error)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    loadPost()
   }, [postId])
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!post) return
 
     if (confirm('정말 이 게시글을 삭제하시겠습니까?')) {
-      worldviewStorage.delete(postId)
+      const success = await worldviewSupabaseStorage.delete(postId)
       
-      // 커스텀 이벤트 발생
-      window.dispatchEvent(new Event('worldviewPostsUpdated'))
-      
-      toast({
-        title: '삭제 완료',
-        description: '게시글이 삭제되었습니다.',
-      })
+      if (success) {
+        // 커스텀 이벤트 발생
+        window.dispatchEvent(new Event('worldviewPostsUpdated'))
+        
+        toast({
+          title: '삭제 완료',
+          description: '게시글이 삭제되었습니다.',
+        })
 
-      router.push(`/characters/${id}/worldview`)
+        router.push(`/characters/${id}/worldview`)
+      } else {
+        toast({
+          title: '삭제 실패',
+          description: '게시글 삭제에 실패했습니다. 다시 시도해주세요.',
+          variant: 'destructive',
+        })
+      }
     }
   }
 
@@ -58,6 +84,14 @@ export default function WorldviewPostDetailPage({
         <Link href="/characters" className="text-primary-token underline">
           캐릭터 목록으로 돌아가기
         </Link>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-4">
+        <p className="text-lg">로딩 중...</p>
       </div>
     )
   }

@@ -13,7 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowLeft, Upload, X, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { events } from '@/features/challenges/constants/events'
-import { eventPostStorage } from '@/features/challenges/constants/eventPosts'
+import { eventPostSupabaseStorage } from '@/features/challenges/lib/eventPostsSupabase'
+import type { EventPost } from '@/features/challenges/constants/eventPosts'
 
 export default function CreateEventPostPage({
   params,
@@ -126,7 +127,7 @@ export default function CreateEventPostPage({
     setImageUrl('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!title.trim() || !author.trim()) {
@@ -147,8 +148,8 @@ export default function CreateEventPostPage({
       return
     }
 
-    const newPost = {
-      id: `event-post-${Date.now()}`,
+    const newPost: EventPost = {
+      id: `event-post-${crypto.randomUUID()}`,
       eventId: eventId,
       author: author.trim(),
       title: title.trim(),
@@ -159,13 +160,22 @@ export default function CreateEventPostPage({
       likes: 0,
     }
 
-    eventPostStorage.save(newPost)
-    toast({
-      title: '등록 완료',
-      description: '인증 사진이 등록되었습니다.',
-    })
+    const success = await eventPostSupabaseStorage.save(newPost)
+    
+    if (success) {
+      toast({
+        title: '등록 완료',
+        description: '인증 사진이 등록되었습니다.',
+      })
 
-    router.push(`/challenges/events/${eventId}`)
+      router.push(`/challenges/events/${eventId}`)
+    } else {
+      toast({
+        title: '등록 실패',
+        description: '인증 사진 등록에 실패했습니다. 다시 시도해주세요.',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (

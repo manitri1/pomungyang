@@ -10,7 +10,7 @@ export default function Hero() {
         <div className="flex flex-col justify-center gap-4">
           <p className="text-xs uppercase tracking-widest text-secondary-token">Transmedia Character Platform</p>
           <h1 className="text-3xl font-extrabold leading-tight md:text-5xl">
-            청명이와 함께 떠나는
+            청멍이와 함께 떠나는
             <span className="block text-[color:rgb(var(--color-primary-500))]">해양 도시 비전 투어</span>
           </h1>
           <p className="max-w-prose text-sm text-secondary-token md:text-base">

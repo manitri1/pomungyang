@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { worldviewStorage, type WorldviewPost, type Media } from '@/features/characters/constants/worldview'
+import { worldviewSupabaseStorage } from '@/features/characters/lib/worldviewSupabase'
+import type { WorldviewPost, Media } from '@/features/characters/constants/worldview'
 import { useToast } from '@/hooks/use-toast'
 import Image from 'next/image'
 
@@ -139,7 +140,7 @@ export default function CreateWorldviewPostPage({
     setMedia(media.filter((m) => m.id !== mediaId))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!title.trim() || !content.trim()) {
@@ -152,7 +153,7 @@ export default function CreateWorldviewPostPage({
     }
 
     const newPost: WorldviewPost = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(), // UUID 생성
       characterId: id,
       title: title.trim(),
       content: content.trim(),
@@ -163,17 +164,25 @@ export default function CreateWorldviewPostPage({
       likes: 0,
     }
 
-    worldviewStorage.save(newPost)
+    const success = await worldviewSupabaseStorage.save(newPost)
     
-    // 커스텀 이벤트 발생 (같은 탭에서도 리스트 갱신)
-    window.dispatchEvent(new Event('worldviewPostsUpdated'))
+    if (success) {
+      // 커스텀 이벤트 발생 (같은 탭에서도 리스트 갱신)
+      window.dispatchEvent(new Event('worldviewPostsUpdated'))
 
-    toast({
-      title: '게시 완료',
-      description: '게시글이 작성되었습니다.',
-    })
+      toast({
+        title: '게시 완료',
+        description: '게시글이 작성되었습니다.',
+      })
 
-    router.push(`/characters/${id}/worldview`)
+      router.push(`/characters/${id}/worldview`)
+    } else {
+      toast({
+        title: '저장 실패',
+        description: '게시글 저장에 실패했습니다. 다시 시도해주세요.',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (

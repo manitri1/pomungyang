@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { UserMenu } from '@/components/auth/UserMenu'
 
 export default function Header() {
   return (
@@ -19,7 +20,7 @@ export default function Header() {
           <Link href="/support" className="hover:underline">Support</Link>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/auth/login" className="rounded bg-brand-secondary px-3 py-1.5 text-white">로그인</Link>
+          <UserMenu />
         </div>
       </div>
     </header>

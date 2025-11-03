@@ -5,6 +5,7 @@ import Providers from './providers';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
 import Footer from '../components/layout/Footer';
+import { AuthProvider } from '@/components/auth/auth-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     default: 'PoMungYang - 트랜스미디어 캐릭터 플랫폼',
     template: '%s | PoMungYang',
   },
-  description: '청명이와 고양이와 함께 떠나는 해양 도시 비전 투어. AR/LBS 체험, 챌린지, 굿즈샵을 만나보세요.',
+  description: '청멍이와 고양이와 함께 떠나는 해양 도시 비전 투어. AR/LBS 체험, 챌린지, 굿즈샵을 만나보세요.',
   keywords: ['캐릭터', '트랜스미디어', 'AR', 'LBS', '투어', '챌린지', '굿즈'],
   authors: [{ name: 'PoMungYang' }],
   openGraph: {
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     url: 'https://pomungyang.com',
     siteName: 'PoMungYang',
     title: 'PoMungYang - 트랜스미디어 캐릭터 플랫폼',
-    description: '청명이와 고양이와 함께 떠나는 해양 도시 비전 투어',
+    description: '청멍이와 고양이와 함께 떠나는 해양 도시 비전 투어',
     images: [
       {
         url: '/characters/cheongmyeong.png',
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'PoMungYang - 트랜스미디어 캐릭터 플랫폼',
-    description: '청명이와 고양이와 함께 떠나는 해양 도시 비전 투어',
+    description: '청멍이와 고양이와 함께 떠나는 해양 도시 비전 투어',
     images: ['/characters/cheongmyeong.png'],
   },
   robots: {
@@ -72,16 +73,18 @@ export default function RootLayout({
       >
         <a href="#main" className="skip-link">본문으로 건너뛰기</a>
         <Providers>
-          <Header />
-          <div className="mx-auto max-w-6xl px-4">
-            <div className="flex gap-6">
-              <Sidebar />
-              <main id="main" className="min-h-[60dvh] w-full py-6">
-                {children}
-              </main>
+          <AuthProvider>
+            <Header />
+            <div className="mx-auto max-w-6xl px-4">
+              <div className="flex gap-6">
+                <Sidebar />
+                <main id="main" className="min-h-[60dvh] w-full py-6">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
-          <Footer />
+            <Footer />
+          </AuthProvider>
         </Providers>
       </body>
     </html>

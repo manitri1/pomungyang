@@ -57,7 +57,7 @@ export default function TourMap() {
           {achievedReward ? (
             <div className="flex items-center gap-2 text-green-700">
               <span className="rounded bg-green-100 px-2 py-1">달성</span>
-              청명이 배지 리워드 지급 대상입니다!
+              청멍이 배지 리워드 지급 대상입니다!
             </div>
           ) : (
             <div className="text-secondary-token">아직 리워드 조건을 충족하지 않았습니다.</div>

@@ -5,7 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { worldviewStorage, type WorldviewPost } from '@/features/characters/constants/worldview'
+import { worldviewSupabaseStorage } from '@/features/characters/lib/worldviewSupabase'
+import type { WorldviewPost } from '@/features/characters/constants/worldview'
 import { ImageIcon, Video, FileText, Eye, Heart, Calendar } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -15,35 +16,45 @@ interface WorldviewPostListProps {
 
 export function WorldviewPostList({ characterId }: WorldviewPostListProps) {
   const [posts, setPosts] = useState<WorldviewPost[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadPosts = () => {
-      const allPosts = worldviewStorage.getAll(characterId)
-      // 최신순 정렬
-      const sorted = allPosts.sort((a, b) => b.createdAt - a.createdAt)
-      setPosts(sorted)
+    const loadPosts = async () => {
+      try {
+        setLoading(true)
+        const allPosts = await worldviewSupabaseStorage.getAll(characterId)
+        // 최신순 정렬 (Supabase에서 이미 정렬됨)
+        setPosts(allPosts)
+      } catch (error) {
+        console.error('게시글 로딩 실패:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadPosts()
     
-    // 로컬 스토리지 변경 감지
-    const handleStorageChange = () => {
-      loadPosts()
-    }
-    
-    window.addEventListener('storage', handleStorageChange)
-    
-    // 커스텀 이벤트로 동일 탭 내 변경 감지
+    // 커스텀 이벤트로 업데이트 감지
     const handleCustomStorage = () => {
       loadPosts()
     }
     window.addEventListener('worldviewPostsUpdated', handleCustomStorage)
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('worldviewPostsUpdated', handleCustomStorage)
     }
   }, [characterId])
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <FileText className="mb-4 h-12 w-12 text-gray-400 animate-pulse" />
+          <p className="text-lg font-medium text-gray-600">로딩 중...</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (posts.length === 0) {
     return (

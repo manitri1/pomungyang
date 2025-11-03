@@ -16,7 +16,7 @@ export default function Home() {
             />
             <div className="space-y-1 p-4">
               <h3 className="line-clamp-1 font-semibold">최신 이벤트 티저 {n}</h3>
-              <p className="line-clamp-2 text-sm text-secondary-token">청명이/고양이 세계관 기반 참여형 콘텐츠를 만나보세요.</p>
+              <p className="line-clamp-2 text-sm text-secondary-token">청멍이/고양이 세계관 기반 참여형 콘텐츠를 만나보세요.</p>
               <a href="/challenges" className="text-sm underline">자세히 보기</a>
             </div>
           </article>

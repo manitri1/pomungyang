@@ -1,13 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { events } from '@/features/challenges/constants/events'
+import { events as initialEvents, type Event } from '@/features/challenges/constants/events'
 import { Calendar, MapPin, Users, Target, ArrowRight } from 'lucide-react'
 
+const STORAGE_KEY = 'public_events'
+
 export default function EventsPage() {
+  const [events, setEvents] = useState<Event[]>(initialEvents)
+
+  useEffect(() => {
+    // localStorage에서 이벤트 로드
+    const loadEvents = () => {
+      if (typeof window === 'undefined') return
+
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          const parsedEvents = JSON.parse(saved)
+          setEvents(parsedEvents)
+        }
+      } catch (error) {
+        console.error('이벤트 로딩 실패:', error)
+      }
+    }
+
+    loadEvents()
+
+    // 이벤트 업데이트 리스너
+    const handleEventsUpdated = () => {
+      loadEvents()
+    }
+
+    window.addEventListener('eventsUpdated', handleEventsUpdated)
+    return () => {
+      window.removeEventListener('eventsUpdated', handleEventsUpdated)
+    }
+  }, [])
+
   return (
     <div className="space-y-6">
       <header>

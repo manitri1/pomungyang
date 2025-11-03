@@ -16,7 +16,7 @@ const items: MenuItem[] = [
   {
     label: '세계관 만들기',
     children: [
-      { href: '/characters/cheongmyeong/worldview', label: '청명이 세계관' },
+      { href: '/characters/cheongmyeong/worldview', label: '청멍이 세계관' },
       { href: '/characters/baeknyang/worldview', label: '백냥이 세계관' },
     ],
   },
