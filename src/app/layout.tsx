@@ -6,6 +6,7 @@ import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
 import Footer from '../components/layout/Footer';
 import { AuthProvider } from '@/components/auth/auth-provider';
+import { PageWrapper } from '@/components/layout/PageWrapper';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -79,7 +80,7 @@ export default function RootLayout({
               <div className="flex gap-6">
                 <Sidebar />
                 <main id="main" className="min-h-[60dvh] w-full py-6">
-                  {children}
+                  <PageWrapper>{children}</PageWrapper>
                 </main>
               </div>
             </div>

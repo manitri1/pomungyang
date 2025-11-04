@@ -7,6 +7,8 @@ import ChallengeDetailSheet from '@/features/challenges/components/ChallengeDeta
 import { PROGRESS_KEY, challenges, type ChallengeProgress, type Challenge } from '@/features/challenges/constants/challenges'
 import { Button } from '@/components/ui/button'
 import { Sparkles } from 'lucide-react'
+import { StaggerContainer, StaggerItem } from '@/components/ui/stagger-container'
+import { FadeIn } from '@/components/ui/fade-in'
 
 export default function Page({
   params,
@@ -52,24 +54,30 @@ export default function Page({
 
   return (
     <div className="space-y-4">
-      <header>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">캐릭터 챌린지</h1>
-            <p className="text-sm text-secondary-token">진행 중 챌린지를 선택해 상세를 확인하고 단계를 완료하세요.</p>
+      <FadeIn>
+        <header>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">캐릭터 챌린지</h1>
+              <p className="text-sm text-secondary-token">진행 중 챌린지를 선택해 상세를 확인하고 단계를 완료하세요.</p>
+            </div>
+            <Link href="/challenges/events">
+              <Button>
+                <Sparkles className="mr-2 h-4 w-4" />
+                이벤트 보기
+              </Button>
+            </Link>
           </div>
-          <Link href="/challenges/events">
-            <Button>
-              <Sparkles className="mr-2 h-4 w-4" />
-              이벤트 보기
-            </Button>
-          </Link>
-        </div>
-      </header>
+        </header>
+      </FadeIn>
       <section aria-label="챌린지 목록" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {computed.map(({ c, prog }) => (
-          <ChallengeCard key={c.id} challenge={c} progress={prog} onOpen={onOpen} />
-        ))}
+        <StaggerContainer>
+          {computed.map(({ c, prog }) => (
+            <StaggerItem key={c.id}>
+              <ChallengeCard challenge={c} progress={prog} onOpen={onOpen} />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
       </section>
       <ChallengeDetailSheet
         open={open}

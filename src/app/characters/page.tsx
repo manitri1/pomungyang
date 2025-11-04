@@ -2,6 +2,8 @@
 
 import CharacterCard from '@/features/characters/components/CharacterCard'
 import { characters } from '@/features/characters/constants/characters'
+import { StaggerContainer, StaggerItem } from '@/components/ui/stagger-container'
+import { FadeIn } from '@/components/ui/fade-in'
 
 export default function Page({
   params,
@@ -12,16 +14,22 @@ export default function Page({
   void params
   return (
     <div className="space-y-4">
-      <header className="flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">캐릭터 소개</h1>
-          <p className="text-sm text-secondary-token">세계관의 캐릭터를 탐색해 보세요.</p>
-        </div>
-      </header>
+      <FadeIn>
+        <header className="flex items-end justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">캐릭터 소개</h1>
+            <p className="text-sm text-secondary-token">세계관의 캐릭터를 탐색해 보세요.</p>
+          </div>
+        </header>
+      </FadeIn>
       <section aria-label="캐릭터 목록" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {characters.map((ch) => (
-          <CharacterCard key={ch.id} character={ch} />
-        ))}
+        <StaggerContainer>
+          {characters.map((ch) => (
+            <StaggerItem key={ch.id}>
+              <CharacterCard character={ch} />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
       </section>
     </div>
   )
